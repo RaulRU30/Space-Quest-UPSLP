@@ -88,26 +88,75 @@ public class GameManagerServer : MonoBehaviour
     
     void HandleCommand(string action, string target)
     {
-        if (action != "open_door" && action != "close_door") return;
-        
-        bool open = action == "open_door";
-
-        Debug.Log("🔑 Searching for door with ID: " + target + " to " + (open ? "open" : "close") + " it");
-        DoorController[] doors = FindObjectsOfType<DoorController>();
-
-        Debug.Log("Doors found : " + doors.Length);
-
-        foreach (var door in doors)
+       if (action == "close_nearest_door")
         {
-            Debug.Log("Door ID: " + door.GetDoorId());
-            if (door.GetDoorId() != target) continue;
-            door.SetDoorState(open);
-            return;
+            CloseNearestDoor();
         }
+        else if (action == "open_door" || action == "close_door")
+        {
+            bool open = action == "open_door";
 
-        Debug.LogWarning("🚫 Door not found: " + target);
+            DoorController[] doors = FindObjectsOfType<DoorController>();
+            foreach (var door in doors)
+            {
+                if (door.GetDoorId() != target) continue;
+                door.SetDoorState(open);
+
+                if (!open) // si se cerró, reabrir luego
+                    StartCoroutine(OpenDoorAfterDelay(door, 3f));
+
+                return;
+            }
+        }
 
     }
 
+    private void CloseNearestDoor()
+    {
+        DoorController[] doors = FindObjectsOfType<DoorController>();
+        if (doors.Length == 0 || playerTransform == null)
+        {
+            Debug.LogWarning("❌ No doors or player transform available.");
+            return;
+        }
+
+        DoorController closest = null;
+        float minDistance = float.MaxValue;
+        Vector3 playerPos = playerTransform.position;
+
+        foreach (var door in doors)
+        {
+            float dist = Vector3.Distance(door.transform.position, playerPos);
+            if (dist < minDistance)
+            {
+                minDistance = dist;
+                closest = door;
+            }
+        }
+
+        if (closest != null)
+        {
+            Debug.Log($"🔒 Closest door to close: {closest.GetDoorId()} at {minDistance:F2}m");
+            closest.SetDoorState(false); // cerrar
+            StartCoroutine(OpenDoorAfterDelay(closest, 3f)); // reabrir luego
+        }
+    }
+
+    private IEnumerator OpenDoorAfterDelay(DoorController door, float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
+        door.SetDoorState(true);
+        Debug.Log("🚪 Door reopened automatically.");
+    }
+
+    private void CloseAllDoors()
+    {
+        DoorController[] doors = FindObjectsOfType<DoorController>();
+        foreach (var door in doors)
+        {
+            door.SetDoorState(false);
+        }
+        Debug.Log($"🔒 {doors.Length} doors closed by remote command.");
+    }
 
 }
