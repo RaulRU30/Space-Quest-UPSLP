@@ -31,7 +31,7 @@ public class DoorController : MonoBehaviour
     public void SetDoorState(bool isOpen)
     {
         _animator.SetBool(CharacterNearby, isOpen);
-        Debug.Log("Door state changed: " + (isOpen ? "Open" : "Closed") + " for door ID: " + doorId);
+        Debug.Log("Door state changed: " + (isOpen ? "Open" : "Open") + " for door ID: " + doorId);
     }
     
     [ContextMenu("Open Door")]
@@ -47,12 +47,22 @@ public class DoorController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+        OpenAllDoorsAtStart();
     }
 
     // Update is called once per frame
     void Update()
     {
         
+    }
+
+    private void OpenAllDoorsAtStart()
+    {
+        DoorController[] doors = FindObjectsOfType<DoorController>();
+        foreach (var door in doors)
+        {
+            door.SetDoorState(true);
+        }
+        Debug.Log($"🚪 {doors.Length} doors opened at start.");
     }
 }
