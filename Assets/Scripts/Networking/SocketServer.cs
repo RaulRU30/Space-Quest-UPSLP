@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
+using TMPro;
 using UnityEngine;
 
 namespace Networking
@@ -19,11 +20,16 @@ namespace Networking
         public Action<NetworkMessage> OnMessageReceived;
         
         private const int Port = 1337;
+        
+        [SerializeField] private TextMeshPro ipText;
 
         private void Start()
         {
             string localIP = GetLocalIPAddress();
             Debug.Log("IP local del dispositivo: " + localIP);
+            
+            if (ipText != null)
+                ipText.text = localIP;
 
             _listenerThread = new Thread(StartServer)
             {
