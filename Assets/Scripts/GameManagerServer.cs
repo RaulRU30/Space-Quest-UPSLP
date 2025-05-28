@@ -10,16 +10,19 @@ public class GameManagerServer : MonoBehaviour
     [SerializeField] private float positionUpdateInterval = 0.2f;
     [SerializeField] private float positionThreshold = 0.05f;
     [SerializeField] private float rotationThreshold = 1f;
-    
+    [SerializeField] private GameObject bombPrefab;
+    [SerializeField] private float bombSpawnHeight = 5f;
     private SocketServer _socket;
     private Vector3 _lastSentPosition;
     private Vector3 _lastSentEulerRotation;
     private float _timer = 0f;
-    
-    void Awake() {
+
+    void Awake()
+    {
         _socket = GetComponent<SocketServer>();
 
-        if (_socket == null) {
+        if (_socket == null)
+        {
             Debug.LogError("Missing SocketServer component.");
             return;
         }
@@ -31,33 +34,39 @@ public class GameManagerServer : MonoBehaviour
     }
 
 
-    private void Update() {
+    private void Update()
+    {
         if (!_socket.isClientConnected || playerTransform == null) return;
-        
+
         _timer += Time.deltaTime;
-        
-        if (_timer >= positionUpdateInterval) {
+
+        if (_timer >= positionUpdateInterval)
+        {
             Vector3 currentPosition = playerTransform.position;
             Vector3 currentRotation = playerTransform.eulerAngles;
-            
+
             bool moved = Vector3.Distance(_lastSentPosition, currentPosition) > positionThreshold;
             bool rotated = Vector3.Distance(_lastSentEulerRotation, currentRotation) > rotationThreshold;
 
-            if (moved || rotated) {
+            if (moved || rotated)
+            {
                 SendPlayerTransform(currentPosition, currentRotation);
                 _lastSentPosition = currentPosition;
                 _lastSentEulerRotation = currentRotation;
             }
-            
+
 
             _timer = 0f;
         }
     }
-    
-    private void SendPlayerTransform(Vector3 position, Vector3 rotation) {
-        var msg = new NetworkMessage {
+
+    private void SendPlayerTransform(Vector3 position, Vector3 rotation)
+    {
+        var msg = new NetworkMessage
+        {
             type = "position",
-            payload = new Payload {
+            payload = new Payload
+            {
                 x = position.x,
                 y = position.y,
                 z = position.z,
@@ -70,11 +79,13 @@ public class GameManagerServer : MonoBehaviour
         _socket.SendMessageToClient(msg);
     }
 
-    
-    void HandleClientMessage(NetworkMessage message) {
+
+    void HandleClientMessage(NetworkMessage message)
+    {
         Debug.Log("📩 Handling client message of type: " + message.type);
 
-        switch (message.type) {
+        switch (message.type)
+        {
             case "command":
                 Debug.Log($"⚙️ Command received: {message.payload.action} on {message.payload.target}");
                 HandleCommand(message.payload.action, message.payload.target);
@@ -85,10 +96,10 @@ public class GameManagerServer : MonoBehaviour
                 break;
         }
     }
-    
+
     void HandleCommand(string action, string target)
     {
-       if (action == "close_nearest_door")
+        if (action == "close_nearest_door")
         {
             CloseNearestDoor();
         }
@@ -108,7 +119,10 @@ public class GameManagerServer : MonoBehaviour
                 return;
             }
         }
-
+        else if (action == "drop_bomb")
+        {
+            DropBombOnPlayer();
+        }
     }
 
     private void CloseNearestDoor()
@@ -159,4 +173,25 @@ public class GameManagerServer : MonoBehaviour
         Debug.Log($"🔒 {doors.Length} doors closed by remote command.");
     }
 
+    private void DropBombOnPlayer()
+    {
+        if (playerTransform == null || bombPrefab == null)
+        {
+            Debug.LogWarning("❌ Cannot drop bomb — missing playerTransform or bombPrefab.");
+            return;
+        }
+
+        StartCoroutine(DropBombWithDelay(6f));
+    }
+    private IEnumerator DropBombWithDelay(float delaySeconds)
+{
+    Debug.Log("⏳ Bomb will drop in " + delaySeconds + " seconds...");
+
+    yield return new WaitForSeconds(delaySeconds); // Espera
+
+    Vector3 spawnPosition = playerTransform.position;
+    Instantiate(bombPrefab, spawnPosition, Quaternion.identity);
+
+    Debug.Log("💣 Bomb dropped on player after delay!");
+}
 }

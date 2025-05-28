@@ -82,7 +82,7 @@ namespace Networking
 
             string json = JsonUtility.ToJson(message);
             _writer.WriteLine(json);
-            Debug.Log("📤 Sent to client: " + json);
+            //Debug.Log("📤 Sent to client: " + json);
 
         }
         
@@ -110,6 +110,49 @@ namespace Networking
             return localIP;
         }
 
+        public void StopServer()
+        {
+            try
+            {
+                Debug.Log("🛑 Stopping server...");
+
+                if (_writer != null)
+                {
+                    _writer.Close();
+                    _writer = null;
+                }
+
+                if (_stream != null)
+                {
+                    _stream.Close();
+                    _stream = null;
+                }
+
+                if (_currentClient != null)
+                {
+                    _currentClient.Close();
+                    _currentClient = null;
+                }
+
+                if (_server != null)
+                {
+                    _server.Stop();
+                    _server = null;
+                }
+
+                if (_listenerThread != null && _listenerThread.IsAlive)
+                {
+                    _listenerThread.Abort(); // Optional — if you're not using a cancellation flag
+                    _listenerThread = null;
+                }
+
+                Debug.Log("✅ Server stopped successfully.");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError("❌ Error stopping server: " + e.Message);
+            }
+        }
 
 
     
