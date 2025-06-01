@@ -11,6 +11,9 @@ namespace Networking
 {
     public class SocketServer : MonoBehaviour
     {
+        private static SocketServer _instance;
+        public static SocketServer Instance => _instance;
+
         private TcpListener _server;
         private TcpClient _currentClient;
         private NetworkStream _stream;
@@ -26,7 +29,7 @@ namespace Networking
         private void Start()
         {
             string localIP = GetLocalIPAddress();
-            Debug.Log("IP local del dispositivo: " + localIP);
+            Debug.Log("Local IP Address: " + localIP);
             
             if (ipText != null)
                 ipText.text = localIP;
@@ -37,20 +40,31 @@ namespace Networking
             };
             _listenerThread.Start();
         }
-    
+
+        private void Awake()
+        {
+            if (_instance != null && _instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+
+            _instance = this;
+            DontDestroyOnLoad(gameObject); 
+        }
+
         private void StartServer()
         {
             _server = new TcpListener(IPAddress.Any, Port);
             _server.Start();
-            Debug.Log("🟢 TCP server listening on port " + Port);
+            Debug.Log("TCP server listening on port " + Port);
 
             _currentClient = _server.AcceptTcpClient();
             _stream = _currentClient.GetStream();
             _writer = new StreamWriter(_stream, Encoding.ASCII);
             _writer.AutoFlush = true;
 
-
-            Debug.Log("🔗 Client connected: " + _currentClient.Client.RemoteEndPoint);
+            Debug.Log("Client connected: " + _currentClient.Client.RemoteEndPoint);
 
             byte[] buffer = new byte[1024];
             int bytesRead;
@@ -109,9 +123,6 @@ namespace Networking
 
             return localIP;
         }
-
-
-
     
         void OnApplicationQuit() {
             _server?.Stop();

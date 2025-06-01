@@ -11,20 +11,13 @@ public class GameManagerServer : MonoBehaviour
     [SerializeField] private float positionThreshold = 0.05f;
     [SerializeField] private float rotationThreshold = 1f;
     
-    private SocketServer _socket;
     private Vector3 _lastSentPosition;
     private Vector3 _lastSentEulerRotation;
     private float _timer = 0f;
     
-    void Awake() {
-        _socket = GetComponent<SocketServer>();
+    void Start () {
 
-        if (_socket == null) {
-            Debug.LogError("Missing SocketServer component.");
-            return;
-        }
-
-        _socket.OnMessageReceived += (msg) =>
+        SocketServer.Instance.OnMessageReceived += (msg) =>
         {
             MessageDispatcher.Instance.Enqueue(() => HandleClientMessage(msg));
         };
@@ -32,7 +25,7 @@ public class GameManagerServer : MonoBehaviour
 
 
     private void Update() {
-        if (!_socket.isClientConnected || playerTransform == null) return;
+        if (!SocketServer.Instance.isClientConnected || playerTransform == null) return;
         
         _timer += Time.deltaTime;
         
@@ -49,7 +42,6 @@ public class GameManagerServer : MonoBehaviour
                 _lastSentEulerRotation = currentRotation;
             }
             
-
             _timer = 0f;
         }
     }
@@ -67,7 +59,7 @@ public class GameManagerServer : MonoBehaviour
             }
         };
 
-        _socket.SendMessageToClient(msg);
+        SocketServer.Instance.SendMessageToClient(msg);
     }
 
     
@@ -88,27 +80,31 @@ public class GameManagerServer : MonoBehaviour
     
     void HandleCommand(string action, string target)
     {
-       if (action == "close_nearest_door")
+        switch (action)
         {
-            CloseNearestDoor();
-        }
-        else if (action == "open_door" || action == "close_door")
-        {
-            bool open = action == "open_door";
-
-            DoorController[] doors = FindObjectsOfType<DoorController>();
-            foreach (var door in doors)
+            case "close_nearest_door":
+                CloseNearestDoor();
+                break;
+            case "open_door":
+            case "close_door":
             {
-                if (door.GetDoorId() != target) continue;
-                door.SetDoorState(open);
+                bool open = action == "open_door";
 
-                if (!open) // si se cerró, reabrir luego
-                    StartCoroutine(OpenDoorAfterDelay(door, 3f));
+                DoorController[] doors = FindObjectsOfType<DoorController>();
+                foreach (var door in doors)
+                {
+                    if (door.GetDoorId() != target) continue;
+                    door.SetDoorState(open);
 
-                return;
+                    if (!open) // si se cerró, reabrir luego
+                        StartCoroutine(OpenDoorAfterDelay(door, 3f));
+
+                    return;
+                }
+
+                break;
             }
         }
-
     }
 
     private void CloseNearestDoor()
