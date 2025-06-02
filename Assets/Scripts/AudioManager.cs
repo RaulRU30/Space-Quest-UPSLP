@@ -1,8 +1,8 @@
 using UnityEngine.Audio;
 using System;
+using System.Collections;
 using UnityEngine;
 
-//Credit to Brackeys youtube tutorial on Audio managers, as the majority of this code and learning how to use it was made by him.
 [System.Serializable]
 public class Sound
 {
@@ -29,8 +29,6 @@ public class AudioManager : MonoBehaviour
     public Sound[] sounds;
 
     public static AudioManager instance;
-    //AudioManager
-
     void Awake()
     {
         instance = this;
@@ -49,6 +47,8 @@ public class AudioManager : MonoBehaviour
             s.source.pitch = s.pitch;
             s.source.loop = s.loop;
         }
+        
+        PlayWithFade("bgm");
     }
 
     public void Play(string name)
@@ -69,4 +69,67 @@ public class AudioManager : MonoBehaviour
 
         s.source.Stop();
     }
+    
+    public void PlayWithFade(string name, float fadeDuration = 1.5f)
+    {
+        Sound s = Array.Find(sounds, sound => sound.name == name);
+        if (s == null)
+        {
+            Debug.LogWarning("Sound: " + name + " not found");
+            return;
+        }
+
+        StartCoroutine(FadeIn(s, fadeDuration));
+    }
+
+    private IEnumerator FadeIn(Sound s, float duration)
+    {
+        if (s.source == null)
+            yield break;
+
+        s.source.volume = 0f;
+        s.source.Play();
+
+        float targetVolume = s.volume;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            s.source.volume = Mathf.Lerp(0f, targetVolume, elapsed / duration);
+            yield return null;
+        }
+
+        s.source.volume = targetVolume;
+    }
+    
+    public void StopWithFade(string name, float fadeDuration = 1f)
+    {
+        Sound s = Array.Find(sounds, sound => sound.name == name);
+        if (s == null || s.source == null)
+        {
+            Debug.LogWarning("Sound not found: " + name);
+            return;
+        }
+
+        StartCoroutine(FadeOutAndStop(s, fadeDuration));
+    }
+
+    private IEnumerator FadeOutAndStop(Sound s, float duration)
+    {
+        float startVolume = s.source.volume;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            s.source.volume = Mathf.Lerp(startVolume, 0f, elapsed / duration);
+            yield return null;
+        }
+
+        s.source.Stop();
+        s.source.volume = s.volume; // reset to default volume for next time
+    }
+
+
 }
