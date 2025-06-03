@@ -130,7 +130,7 @@ namespace Networking
 
             string json = JsonUtility.ToJson(message);
             _writer.WriteLine(json);
-            Debug.Log("📤 Sent to client: " + json);
+//            Debug.Log("📤 Sent to client: " + json);
 
         }
         

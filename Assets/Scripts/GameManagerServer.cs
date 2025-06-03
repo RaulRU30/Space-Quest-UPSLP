@@ -66,8 +66,18 @@ public class GameManagerServer : MonoBehaviour
 
         SocketServer.Instance.SendMessageToClient(msg);
     }
-    public void SendTextCode(String codeText)
-    {
+    public void SendIndexCode(int NumeroEstado){
+        var msg = new NetworkMessage
+        {
+            type = "IndexCode",
+            payload = new Payload
+            {
+                codeindex = NumeroEstado,
+            }
+        };
+        SocketServer.Instance.SendMessageToClient(msg);
+    }
+    public void SendTextCode(String codeText){
         var msg = new NetworkMessage
         {
             type = "GeneratorCode",

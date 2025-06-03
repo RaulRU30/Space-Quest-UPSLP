@@ -7,9 +7,9 @@ public class CodeTest : MonoBehaviour
     public CodeGenerator codeGenerator;
     public Image[] codeSlots;
     public Image successIndicator;
-
     private int currentIndex = 0;
     private Color defaultColor = new Color32(0x35, 0x9E, 0xB2, 0xFF); // #359EB2
+    public GameManagerServer gameManagerServer;
 
     public void AddLetter(string letter)
     {
@@ -25,13 +25,17 @@ public class CodeTest : MonoBehaviour
         if (letter == expectedLetter)
         {
             if (codeSlots != null && codeSlots.Length > currentIndex)
+            {
                 codeSlots[currentIndex].color = Color.green;
+                gameManagerServer.SendIndexCode(1);   
+            }
 
             currentIndex++;
 
             if (currentIndex == generatedCode.Length)
             {
                 Debug.Log("Código correcto");
+                //gameManagerServer.SendIndexCode(3);
 
                 if (successIndicator != null)
                     successIndicator.color = Color.green;
@@ -40,6 +44,7 @@ public class CodeTest : MonoBehaviour
         else
         {
             Debug.Log("Letra incorrecta, reiniciado");
+            //gameManagerServer.SendIndexCode(1);
             StartCoroutine(ResetWithRedFlash());
         }
     }

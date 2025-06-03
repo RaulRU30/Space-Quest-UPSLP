@@ -19,15 +19,15 @@ public class CodeGenerator : MonoBehaviour
         for (int i = 0; i < codeSlots.Length; i++)
         {
             string randomChar = possibleLetters[Random.Range(0, possibleLetters.Length)];
-            codeSlots[i].text = randomChar;
+            //codeSlots[i].text = randomChar;
             generatedCode += randomChar;
         }
         gameManagerServer.SendTextCode(generatedCode);
-        Debug.Log("Codigo generado: " + generatedCode);
+        //Debug.Log("Codigo generado: " + generatedCode);
     }
 
-    public string GetGeneratedCode()
-    {
+    public string GetGeneratedCode(){
+        Debug.Log("Codigo generado CodeGenerator: " + generatedCode);
         return generatedCode;
     }
 }
