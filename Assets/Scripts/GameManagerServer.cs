@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -14,8 +15,12 @@ public class GameManagerServer : MonoBehaviour
     private Vector3 _lastSentPosition;
     private Vector3 _lastSentEulerRotation;
     private float _timer = 0f;
-    
     void Start () {
+        
+        if(SocketServer.Instance == null) {
+            Debug.LogError("SocketServer instance is not initialized. Make sure to start the server first.");
+            return;
+        }
 
         SocketServer.Instance.OnMessageReceived += (msg) =>
         {
@@ -61,7 +66,18 @@ public class GameManagerServer : MonoBehaviour
 
         SocketServer.Instance.SendMessageToClient(msg);
     }
-
+    public void SendTextCode(String codeText)
+    {
+        var msg = new NetworkMessage
+        {
+            type = "GeneratorCode",
+            payload = new Payload
+            {
+                code = codeText,
+            }
+        };
+        SocketServer.Instance.SendMessageToClient(msg);
+    }
     
     void HandleClientMessage(NetworkMessage message) {
         Debug.Log("📩 Handling client message of type: " + message.type);
