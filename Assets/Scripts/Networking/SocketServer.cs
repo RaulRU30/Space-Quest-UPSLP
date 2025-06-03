@@ -39,7 +39,7 @@ namespace Networking
             if (ipText != null)
                 ipText.text = localIP;
             
-            if (gameStartMenu.simulateConnection)
+            if (gameStartMenu!=null && gameStartMenu.simulateConnection)
             {
                 return;
             }
