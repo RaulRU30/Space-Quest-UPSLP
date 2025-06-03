@@ -16,6 +16,11 @@ public class GameManagerServer : MonoBehaviour
     private Vector3 _lastSentEulerRotation;
     private float _timer = 0f;
     void Start () {
+        
+        if(SocketServer.Instance == null) {
+            Debug.LogError("SocketServer instance is not initialized. Make sure to start the server first.");
+            return;
+        }
 
         SocketServer.Instance.OnMessageReceived += (msg) =>
         {
