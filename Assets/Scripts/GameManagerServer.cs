@@ -12,6 +12,7 @@ public class GameManagerServer : MonoBehaviour
     [SerializeField] private float positionThreshold = 0.05f;
     [SerializeField] private float rotationThreshold = 1f;
     public CodeTest codeTest;
+    public GameObject minigameMessageUI;
     
     private Vector3 _lastSentPosition;
     private Vector3 _lastSentEulerRotation;
@@ -138,6 +139,8 @@ public class GameManagerServer : MonoBehaviour
                 else
                 {
                     KeyManager.Instance.MostrarTodasLasLlaves();
+                        if (minigameMessageUI != null)
+                        minigameMessageUI.SetActive(true);
                     Debug.Log("✅ Llaves mostradas desde GameManagerServer");
                 }
 
