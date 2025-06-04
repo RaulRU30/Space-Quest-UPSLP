@@ -63,7 +63,7 @@ public class CodeTest : MonoBehaviour
         if (currentIndex == generatedCode.Length)
         {
             OnCodeCompleted();
-            gameManagerServer.SendIndexCode(3,0);
+            gameManagerServer.SendIndexCode(3, 0);
         }
     }
 

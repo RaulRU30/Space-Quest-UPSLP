@@ -80,7 +80,21 @@ public class GameManagerServer : MonoBehaviour
         };
         SocketServer.Instance.SendMessageToClient(msg);
     }
-    public void SendTextCode(String codeText){
+    public void SendComplateTask(int state)
+    {
+        var msg = new NetworkMessage
+        {
+            type = "TaskComplate",
+            payload = new Payload
+            {
+                state = state,
+
+            }
+        };
+        SocketServer.Instance.SendMessageToClient(msg);
+    }
+    public void SendTextCode(String codeText)
+    {
         var msg = new NetworkMessage
         {
             type = "GeneratorCode",
@@ -101,7 +115,6 @@ public class GameManagerServer : MonoBehaviour
                 HandleCommand(message.payload.action, message.payload.target);
                 break;
             case "StartCode":
-                Debug.Log("Mensaje del cliente");
                 codeTest.GenerateCode();
                 break;
             default:
