@@ -54,7 +54,7 @@ namespace Networking
 
         private void Update()
         {
-            Debug.Log("Update");
+            //Debug.Log("Update");
         }
 
         private void Awake()

@@ -13,6 +13,15 @@ public class KeyPickup : MonoBehaviour
     private XRGrabInteractable grab;
     private bool yaRecolectada = false;
 
+    void Start()
+    {
+        /*if (!KeyManager.minijuegoActivo)
+        {
+            foreach (Transform child in transform)
+                child.gameObject.SetActive(false);
+        }*/
+    }
+
     private void Awake()
     {
         grab = GetComponent<XRGrabInteractable>();
