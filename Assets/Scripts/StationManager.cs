@@ -11,6 +11,8 @@ public class StationManager : MonoBehaviour
     public List<Sprite> stationSprites;
 
     private Station currentTargetStation;
+
+    public GameManagerServer gameManagerServer;
     private int currentTargetIndex = -1;
 
     public Sprite successSprite;
@@ -32,7 +34,7 @@ public class StationManager : MonoBehaviour
         {
             Debug.Log("✅ Correct station pressed!");
 
-            if (currentTargetIndex+1 >= stationSprites.Count)
+            if (currentTargetIndex + 1 >= stationSprites.Count)
             {
                 Debug.Log("🎉 Secuencia completada" + stationSprites.Count);
                 ShowSuccess();
@@ -40,8 +42,10 @@ public class StationManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("🎉 Secuencia completada" + stationSprites.Count+" "+currentTargetIndex);
+                Debug.Log("🎉 Secuencia completada" + stationSprites.Count + " " + currentTargetIndex);
                 SetNextStation();
+                FindObjectOfType<GameManagerServer>()?.SendComplateTask(2);
+
             }
         }   
         else
