@@ -12,6 +12,7 @@ public class KeyPickup : MonoBehaviour
     [SerializeField] private string keyId = "key_1";
     private XRGrabInteractable grab;
     private bool yaRecolectada = false;
+    public GameManagerServer gameManagerServer;
 
     void Start()
     {
@@ -32,8 +33,10 @@ public class KeyPickup : MonoBehaviour
     {
         if (yaRecolectada) return;
         yaRecolectada = true;
+        
+        grab.interactionManager.SelectExit(args.interactorObject, grab);
 
-        Debug.Log($"✅ LLAVE AGARRADA: {keyId}");
+        //Debug.Log($"✅ LLAVE AGARRADA: {keyId}");
         AudioManager.instance.Play("pickup_key");
 
         // Oculta visual y colisión
@@ -42,10 +45,10 @@ public class KeyPickup : MonoBehaviour
 
         grab.colliders.Clear(); // prevenir agarres adicionales
 
-        SendKeyCollectedMessage();
+        FindObjectOfType<GameManagerServer>()?.SendKeyCollectedMessage(keyId);
 
         // Forzar liberación antes de destruir
-        grab.interactionManager.SelectExit(args.interactorObject, grab);
+        
 
         StartCoroutine(DestruirDespues());
     }
@@ -57,21 +60,6 @@ public class KeyPickup : MonoBehaviour
         Destroy(gameObject);
     }
 
-    private void SendKeyCollectedMessage()
-    {
-        var msg = new NetworkMessage
-        {
-            type = "event",
-            payload = new Payload
-            {
-                action = "collect_key",
-                target = keyId
-            }
-        };
-
-        SocketServer.Instance.SendMessageToClient(msg);
-        Debug.Log($"📨 Enviado al Companion: {keyId}");
-    }
 
     private void OnDestroy()
     {

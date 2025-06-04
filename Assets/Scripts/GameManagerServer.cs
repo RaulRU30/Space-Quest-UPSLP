@@ -145,7 +145,21 @@ public class GameManagerServer : MonoBehaviour
         }
     }
 
-    
+    public void SendKeyCollectedMessage(string keyId)
+    {
+        var msg = new NetworkMessage
+        {
+            type = "event",
+            payload = new Payload
+            {
+                action = "collect_key",
+                target = keyId
+            }
+        };
+
+        SocketServer.Instance.SendMessageToClient(msg);
+        Debug.Log($"📨 Enviado al Companion: {keyId}");
+    }
     
 
 }
