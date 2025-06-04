@@ -115,6 +115,7 @@ public class GameManagerServer : MonoBehaviour
                 HandleCommand(message.payload.action, message.payload.target);
                 break;
             case "StartCode":
+                Debug.Log("llega el mensaje del cliente");
                 codeTest.GenerateCode();
                 break;
             default:
