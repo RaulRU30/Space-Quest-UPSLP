@@ -19,6 +19,7 @@ namespace Networking
         public string name;
         public string room;
         public int codeindex;
+        public int state;
         public String code;
     }
 }

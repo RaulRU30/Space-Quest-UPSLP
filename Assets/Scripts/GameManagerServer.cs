@@ -11,6 +11,7 @@ public class GameManagerServer : MonoBehaviour
     [SerializeField] private float positionUpdateInterval = 0.2f;
     [SerializeField] private float positionThreshold = 0.05f;
     [SerializeField] private float rotationThreshold = 1f;
+    public CodeTest codeTest;
     
     private Vector3 _lastSentPosition;
     private Vector3 _lastSentEulerRotation;
@@ -66,13 +67,15 @@ public class GameManagerServer : MonoBehaviour
 
         SocketServer.Instance.SendMessageToClient(msg);
     }
-    public void SendIndexCode(int NumeroEstado){
+    public void SendIndexCode(int NumeroEstado, int index){
         var msg = new NetworkMessage
         {
             type = "IndexCode",
             payload = new Payload
             {
-                codeindex = NumeroEstado,
+                state = NumeroEstado,
+                codeindex = index,
+
             }
         };
         SocketServer.Instance.SendMessageToClient(msg);
@@ -97,7 +100,10 @@ public class GameManagerServer : MonoBehaviour
                 Debug.Log($"⚙️ Command received: {message.payload.action} on {message.payload.target}");
                 HandleCommand(message.payload.action, message.payload.target);
                 break;
-
+            case "StartCode":
+                Debug.Log("Mensaje del cliente");
+                codeTest.GenerateCode();
+                break;
             default:
                 Debug.Log("❓ Unknown message type: " + message.type);
                 break;
