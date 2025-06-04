@@ -20,7 +20,10 @@ public class SequenceNumberGameManager : MonoBehaviour
     private float _timeRemaining;
     private bool _isGameActive = false;
 
-    
+
+
+
+
     private void Awake()
     {
         Instance = this;
@@ -171,7 +174,7 @@ public class SequenceNumberGameManager : MonoBehaviour
         lightColorChanger.ChangeColorToGreen();
         _isGameActive = false;
         countdownText.text = "¡Ganaste!";
-        
+        FindObjectOfType<GameManagerServer>()?.SendComplateTask(3);
         
         foreach (var button in numberButtons)
         {

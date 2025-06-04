@@ -119,6 +119,9 @@ public class GameManagerServer : MonoBehaviour
                 Debug.Log("llega el mensaje del cliente");
                 codeTest.GenerateCode();
                 break;
+            case "wincommand":
+                SceneTransitionManager.singleton.GoToScene(0);
+                break;
             default:
                 Debug.Log("❓ Unknown message type: " + message.type);
                 break;
