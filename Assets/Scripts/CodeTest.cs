@@ -1,76 +1,98 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
-using System.Collections;
+using TMPro;
 
 public class CodeTest : MonoBehaviour
 {
-    public CodeGenerator codeGenerator;
-    public Image[] codeSlots;
+    public TextMeshProUGUI[] codeSlotsText;
+    public Image[] codeSlotsImage;
     public Image successIndicator;
+    public Color correctColor = Color.green;
+    public Color wrongColor = Color.red;
+    public Color defaultColor = new Color32(0x35, 0x9E, 0xB2, 0xFF); // #359EB2
+
+    private string[] possibleLetters = { "A", "B", "Z", "X" };
+    private string[] generatedCode;
+    public string generatedCodeString { get; private set; }
     private int currentIndex = 0;
-    private Color defaultColor = new Color32(0x35, 0x9E, 0xB2, 0xFF); // #359EB2
+
     public GameManagerServer gameManagerServer;
 
-    public void AddLetter(string letter)
+    void Start()
     {
-        string generatedCode = codeGenerator.GetGeneratedCode();
+        // GenerateCode();
+    }
 
-        if (currentIndex >= generatedCode.Length)
-            return;
+    public void GenerateCode()
+    {
+        generatedCode = new string[codeSlotsText.Length];
+        currentIndex = 0;
 
-        string expectedLetter = generatedCode[currentIndex].ToString();
-
-        Debug.Log($"Letra presionada: {letter}, esperada: {expectedLetter}");
-
-        if (letter == expectedLetter)
+        for (int i = 0; i < codeSlotsText.Length; i++)
         {
-            if (codeSlots != null && codeSlots.Length > currentIndex)
-            {
-                codeSlots[currentIndex].color = Color.green;
-                gameManagerServer.SendIndexCode(1);   
-            }
+            string randomLetter = possibleLetters[Random.Range(0, possibleLetters.Length)];
+            generatedCode[i] = randomLetter;
+            codeSlotsText[i].text = randomLetter;
+        }
 
-            currentIndex++;
+        generatedCodeString = string.Join("", generatedCode);
+        Debug.Log("Code: " + generatedCodeString);
+        gameManagerServer.SendTextCode(generatedCodeString);
+    }
 
-            if (currentIndex == generatedCode.Length)
-            {
-                Debug.Log("Código correcto");
-                //gameManagerServer.SendIndexCode(3);
+    public void AddLetter(string input)
+    {
+        if (currentIndex >= generatedCode.Length) return;
 
-                if (successIndicator != null)
-                    successIndicator.color = Color.green;
-            }
+        if (input == generatedCode[currentIndex])
+        {
+            OnCorrectInput();
         }
         else
         {
-            Debug.Log("Letra incorrecta, reiniciado");
-            //gameManagerServer.SendIndexCode(1);
-            StartCoroutine(ResetWithRedFlash());
+            OnWrongInput();
         }
     }
 
-    private IEnumerator ResetWithRedFlash()
+    private void OnCorrectInput()
     {
-        foreach (var slot in codeSlots)
+        codeSlotsImage[currentIndex].color = correctColor;
+        currentIndex++;
+        gameManagerServer.SendIndexCode(1,currentIndex-1);
+
+        if (currentIndex == generatedCode.Length)
         {
-            if (slot != null)
-                slot.color = Color.red;
+            OnCodeCompleted();
+            gameManagerServer.SendIndexCode(3,0);
         }
-
-        yield return new WaitForSeconds(1f);
-
-        ResetCode();
     }
 
-    public void ResetCode()
+    private void OnWrongInput()
     {
-        currentIndex = 0;
-
-        foreach (var slot in codeSlots)
+        gameManagerServer.SendIndexCode(2,0);
+        for (int i = 0; i < codeSlotsImage.Length; i++)
         {
-            if (slot != null)
-                slot.color = defaultColor;
+            codeSlotsImage[i].color = wrongColor;
         }
-        codeGenerator.GenerateCode();
+
+        Invoke(nameof(ResetImagesAndGenerateNewCode), 1.0f);
+    }
+
+    private void OnCodeCompleted()
+    {
+        Debug.Log("¡Código completado correctamente!");
+        if (successIndicator != null)
+            successIndicator.color = Color.green;
+    }
+
+    private void ResetImagesAndGenerateNewCode()
+    {
+        // Reiniciar colores aquí
+        for (int i = 0; i < codeSlotsImage.Length; i++)
+        {
+            codeSlotsImage[i].color = defaultColor;
+        }
+
+        GenerateCode();
     }
 }
