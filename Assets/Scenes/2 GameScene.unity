@@ -3577,7 +3577,6 @@ GameObject:
   m_Component:
   - component: {fileID: 793469850}
   - component: {fileID: 793469847}
-  - component: {fileID: 793469851}
   m_Layer: 0
   m_Name: ServerManager
   m_TagString: Untagged
@@ -3616,20 +3615,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 130226286}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &793469851
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 793469846}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3506f8925ee945a4f978c6e6e392f536, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ipText: {fileID: 0}
-  gameStartMenu: {fileID: 0}
 --- !u!65 &807981310 stripped
 BoxCollider:
   m_CorrespondingSourceObject: {fileID: 6538828, guid: d2eb17f175564e84c8ad78ac03232e29, type: 3}
@@ -4374,7 +4359,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1011021406}
   - component: {fileID: 1011021405}
-  - component: {fileID: 1011021407}
   m_Layer: 0
   m_Name: XR Interaction Manager
   m_TagString: Untagged
@@ -4411,18 +4395,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1472182211}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1011021407
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1011021404}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc4390dd99a57454c8df88a04d931674, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &1011039490
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -52,6 +52,11 @@ namespace Networking
 
         }
 
+        private void Update()
+        {
+            Debug.Log("Update");
+        }
+
         private void Awake()
         {
             if (_instance != null && _instance != this)
@@ -121,6 +126,12 @@ namespace Networking
             
 
         }
+        
+        private void OnDestroy()
+        {
+            Debug.LogWarning("[SocketServer] OnDestroy llamado — El objeto fue destruido");
+        }
+
         
         public void SendMessageToClient(NetworkMessage message) {
             if (_writer == null) {
