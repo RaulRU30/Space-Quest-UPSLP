@@ -11,6 +11,7 @@ public class GameManagerServer : MonoBehaviour
     [SerializeField] private float positionUpdateInterval = 0.2f;
     [SerializeField] private float positionThreshold = 0.05f;
     [SerializeField] private float rotationThreshold = 1f;
+    public CodeTest codeTest;
     
     private Vector3 _lastSentPosition;
     private Vector3 _lastSentEulerRotation;
@@ -66,6 +67,32 @@ public class GameManagerServer : MonoBehaviour
 
         SocketServer.Instance.SendMessageToClient(msg);
     }
+    public void SendIndexCode(int NumeroEstado, int index){
+        var msg = new NetworkMessage
+        {
+            type = "IndexCode",
+            payload = new Payload
+            {
+                state = NumeroEstado,
+                codeindex = index,
+
+            }
+        };
+        SocketServer.Instance.SendMessageToClient(msg);
+    }
+    public void SendComplateTask(int state)
+    {
+        var msg = new NetworkMessage
+        {
+            type = "TaskComplate",
+            payload = new Payload
+            {
+                state = state,
+
+            }
+        };
+        SocketServer.Instance.SendMessageToClient(msg);
+    }
     public void SendTextCode(String codeText)
     {
         var msg = new NetworkMessage
@@ -87,7 +114,9 @@ public class GameManagerServer : MonoBehaviour
                 Debug.Log($"⚙️ Command received: {message.payload.action} on {message.payload.target}");
                 HandleCommand(message.payload.action, message.payload.target);
                 break;
-
+            case "StartCode":
+                codeTest.GenerateCode();
+                break;
             default:
                 Debug.Log("❓ Unknown message type: " + message.type);
                 break;
@@ -98,77 +127,39 @@ public class GameManagerServer : MonoBehaviour
     {
         switch (action)
         {
-            case "close_nearest_door":
-                CloseNearestDoor();
-                break;
-            case "open_door":
-            case "close_door":
-            {
-                bool open = action == "open_door";
+            case "start_key_game":
+                Debug.Log("🟢 Recibido: start_key_game");
 
-                DoorController[] doors = FindObjectsOfType<DoorController>();
-                foreach (var door in doors)
+                if (KeyManager.Instance == null)
                 {
-                    if (door.GetDoorId() != target) continue;
-                    door.SetDoorState(open);
-
-                    if (!open) // si se cerró, reabrir luego
-                        StartCoroutine(OpenDoorAfterDelay(door, 3f));
-
-                    return;
+                    Debug.LogError("❌ KeyManagerVR.Instance es null");
+                }
+                else
+                {
+                    KeyManager.Instance.MostrarTodasLasLlaves();
+                    Debug.Log("✅ Llaves mostradas desde GameManagerServer");
                 }
 
                 break;
-            }
+            
         }
     }
 
-    private void CloseNearestDoor()
+    public void SendKeyCollectedMessage(string keyId)
     {
-        DoorController[] doors = FindObjectsOfType<DoorController>();
-        if (doors.Length == 0 || playerTransform == null)
+        var msg = new NetworkMessage
         {
-            Debug.LogWarning("❌ No doors or player transform available.");
-            return;
-        }
-
-        DoorController closest = null;
-        float minDistance = float.MaxValue;
-        Vector3 playerPos = playerTransform.position;
-
-        foreach (var door in doors)
-        {
-            float dist = Vector3.Distance(door.transform.position, playerPos);
-            if (dist < minDistance)
+            type = "event",
+            payload = new Payload
             {
-                minDistance = dist;
-                closest = door;
+                action = "collect_key",
+                target = keyId
             }
-        }
+        };
 
-        if (closest != null)
-        {
-            Debug.Log($"🔒 Closest door to close: {closest.GetDoorId()} at {minDistance:F2}m");
-            closest.SetDoorState(false); // cerrar
-            StartCoroutine(OpenDoorAfterDelay(closest, 3f)); // reabrir luego
-        }
+        SocketServer.Instance.SendMessageToClient(msg);
+        Debug.Log($"📨 Enviado al Companion: {keyId}");
     }
-
-    private IEnumerator OpenDoorAfterDelay(DoorController door, float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
-        door.SetDoorState(true);
-        Debug.Log("🚪 Door reopened automatically.");
-    }
-
-    private void CloseAllDoors()
-    {
-        DoorController[] doors = FindObjectsOfType<DoorController>();
-        foreach (var door in doors)
-        {
-            door.SetDoorState(false);
-        }
-        Debug.Log($"🔒 {doors.Length} doors closed by remote command.");
-    }
+    
 
 }

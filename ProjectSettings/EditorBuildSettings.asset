@@ -8,12 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/1 Start Scene.unity
     guid: 99c9720ab356a0642a771bea13969a05
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/2 GameScene.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
     path: Assets/Samples/XR Interaction Toolkit/2.6.4/Starter Assets/DemoScene.unity
     guid: 319dafa5c80f29f428dc1e0d03f04177
+  - enabled: 1
+    path: Assets/Scenes/Pedro.unity
+    guid: 3cb7436fbdecf244a989cd1a843cddfb
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: b5637e07911e66147acc09e8649aea38, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 32d7100d66b360d4bad38678332dcb9f, type: 2}
