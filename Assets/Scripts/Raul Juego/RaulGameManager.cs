@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class RaulGameManager : MonoBehaviour
 {
+
     [SerializeField] private List<int> correctSequence = new List<int> {1, 3, 2, 4};
     private List<int> currentSequence = new List<int>();
     

@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 public class LightColorChanger : MonoBehaviour
 {
-    [Header("Referencias")]
+    [Header("Light 1")]
     public Renderer wallRenderer;
     public Light pointLight;
+    
+    [FormerlySerializedAs("wallRenderer_light2")] [Header("Light 2")]
+    public Renderer wallRendererLight2;
+    [FormerlySerializedAs("pointLight_light2")] public Light pointLightLight2;
 
     [Header("Material Info")]
     public int materialIndexToChange = 1;
@@ -50,6 +55,25 @@ public class LightColorChanger : MonoBehaviour
         if (pointLight != null)
         {
             pointLight.color = newColor;
+        }
+        
+        if (wallRendererLight2 != null)
+        {
+            Material[] materials2 = wallRendererLight2.materials;
+            if (materialIndexToChange >= 0 && materialIndexToChange < materials2.Length)
+            {
+                materials2[materialIndexToChange].SetColor(colorProperty, newColor);
+                wallRendererLight2.materials = materials2;
+            }
+            else
+            {
+                Debug.LogWarning("Índice de material inválido (Light 2).");
+            }
+        }
+
+        if (pointLightLight2 != null)
+        {
+            pointLightLight2.color = newColor;
         }
     }
 
