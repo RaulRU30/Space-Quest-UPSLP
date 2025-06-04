@@ -52,11 +52,6 @@ namespace Networking
 
         }
 
-        private void Update()
-        {
-            Debug.Log("Update");
-        }
-
         private void Awake()
         {
             if (_instance != null && _instance != this)
